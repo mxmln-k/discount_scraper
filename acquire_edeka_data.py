@@ -17,6 +17,8 @@ driver: ChromeWebDriver = webdriver.Chrome(options=chrome_options)
 driver.get(EDEKA_CENTER_REES_URL)
 driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT_SECONDS)
 
+# TODO: check whether discounts are of coming week
+
 list_candidates = driver.find_elements(by=By.XPATH, value="//filter-results//ul[@id='filter-results-list']")
 
 for candidate in list_candidates:
@@ -40,3 +42,4 @@ for candidate in list_candidates:
         else:
             print(f"\tSkipping child: {category_name}")
 
+driver.quit()
