@@ -6,7 +6,17 @@ Scrapes current discounts in local supermarket from their websites, packages the
 
 ### Installing dependencies
 
-**Option 1: uv**
+**Option 1: Makefile**
+
+#### Using Makefile
+
+If your setup supports makefiles just run the following command:
+
+```bash
+make setup
+```
+
+**Option 2: uv**
 
 Ensure [`uv`](https://docs.astral.sh/uv/) is installed following their [official documentation](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -23,7 +33,7 @@ Then, activate the virtual environment:
 | MacOS | ```source .venv/bin/activate``` |
 | Windows | ```.venv\Scripts\activate``` |
 
-**Option 2: pip**
+**Option 3: pip**
 
 Install the python dependencies with [pip](https://pypi.org/project/pip/):
 
@@ -41,12 +51,24 @@ Then activate the virtual environment:
 Install the required dependencies:
 
 ```bash
-pip install -e ".[dev]"
+pip install .
 ```
 
 ### Running Dagster
 
-Start the Dagster UI web server:
+Start the Dagster UI web server.
+
+**Option 1: Using Makefiles:**
+
+If you setup supports makefiles just run the following command:
+
+```bash
+make gui
+```
+
+**Option 2: Directly in Terminal**
+
+Run the following command:
 
 ```bash
 dg dev
