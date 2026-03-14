@@ -1,6 +1,9 @@
 # .notes folder
 .notes
 
+# Temp folder of dagster gui (dagster dev)
+.tmp_*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
