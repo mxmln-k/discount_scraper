@@ -1,13 +1,14 @@
-import json
-
+from typing import Iterable
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 from hercynia_bar_discount_tool.processors.processor import Processor
-from hercynia_bar_discount_tool.constants import COLLECTED_DATA
-from hercynia_bar_discount_tool.helpers import get_joined_textsubnodes_text
+from hercynia_bar_discount_tool.helpers import (
+    get_joined_textsubnodes_text,
+    match_keywords,
+)
 
 
 class EdekaProcessor(Processor):
@@ -26,7 +27,6 @@ class EdekaProcessor(Processor):
                 get_joined_textsubnodes_text(driver, article_price)
                 for article_price in article_price_list
             ]
-            print(f"\t\t\t{'\n\t\t\t'.join(article_price_strings)}")
 
             return article_price_strings
         return []
@@ -41,20 +41,26 @@ class EdekaProcessor(Processor):
             article_payback_extra_points_text = get_joined_textsubnodes_text(
                 driver, article_payback_extra_points
             )
-            print("\t\t\t" + article_payback_extra_points_text)
 
             return article_payback_extra_points_text
         except NoSuchElementException:
             return None
 
     def _parse_article(
-        self, driver: WebDriver, article: WebElement, category_data: dict
+        self,
+        driver: WebDriver,
+        article: WebElement,
+        article_keywords: Iterable[str] | None,
+        category_data: dict,
     ) -> None:
         article_name_text = get_joined_textsubnodes_text(
             driver, article.find_element(by=By.XPATH, value=".//h4/a")
         )
+
+        if not match_keywords(article_name_text, article_keywords):
+            return
+
         category_data[article_name_text] = []
-        print(f"\t\tParsing article: {article_name_text}")
 
         article_prices = self._get_article_prices(driver, article)
         category_data[article_name_text].extend(article_prices)
@@ -68,7 +74,8 @@ class EdekaProcessor(Processor):
         driver: WebDriver,
         category: WebElement,
         category_name: str,
-        data: dict[str, dict],
+        article_keywords: Iterable[str] | None,
+        data: dict[str, dict[str, list[str]]],
     ) -> None:
         # entries hidden only to user and displayed by "load more",
         # but always present in html
@@ -78,10 +85,16 @@ class EdekaProcessor(Processor):
             data[category_name] = {}
 
             for article in articles:
-                self._parse_article(driver, article, data[category_name])
+                self._parse_article(
+                    driver, article, article_keywords, data[category_name]
+                )
 
-    def process(self, url: str) -> dict[str, dict[str, list[str]]] | None:
-        driver = self._open_browser_window(url)
+    def _run_processing(
+        self,
+        driver: WebDriver,
+        category_keywords: Iterable[str] | None,
+        article_keywords: Iterable[str] | None,
+    ) -> dict[str, dict[str, list[str]]] | None:
 
         if not self._check_for_discount_period():
             return None
@@ -90,12 +103,12 @@ class EdekaProcessor(Processor):
             by=By.XPATH, value="//filter-results//ul[@id='filter-results-list']/li"
         )
 
-        parsed_data = {}
+        parsed_data: dict[str, dict[str, list[str]]] = {}
         for category in categorys:
             name = category.get_attribute("id")
-            if name.lower() in ["getraenke", "getränke"]:
-                self._parse_category(driver, category, name, parsed_data)
-
-        self._quit_driver(driver)
+            if match_keywords(name, category_keywords):
+                self._parse_category(
+                    driver, category, name, article_keywords, parsed_data
+                )
 
         return parsed_data

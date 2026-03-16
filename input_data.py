@@ -2,15 +2,15 @@ import dagster as dg
 from hercynia_bar_discount_tool.constants import SHOPS_PATH
 
 
-@dg.definitions
-def resources() -> dg.Definitions:
-    shops = []
+@dg.assets
+def shops() -> dg.Definitions:
+    shop_list = []
     with open(SHOPS_PATH, "r") as f:
         for line in f:
             if line.strip() and not line.strip().startswith("#"):
                 url, kind = line.split("=")
-                shops.append((url.strip(), kind.strip()))
+                shop_list.append((url.strip(), kind.strip()))
 
     return dg.Definitions(resources={
-        "shops": tuple(shops),
+        "shops": tuple(shop_list),
     })

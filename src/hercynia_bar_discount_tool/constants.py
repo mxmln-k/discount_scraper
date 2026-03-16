@@ -1,23 +1,26 @@
 from pathlib import Path
+from hercynia_bar_discount_tool.processors.edeka_processor import EdekaProcessor
 
-# Generall settings
-PAGE_LOAD_TIMEOUT_SECONDS = 5
-USER_AGENT = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
-    + "Chrome/60.0.3112.50 Safari/537.36"
-)
+# Input data path
+INPUT_DATA_PATH = Path(__file__).parent.parent.parent / "input_data"
+# Shop URLs path
+SHOPS_PATH = INPUT_DATA_PATH / "shops.csv"
+# Categories names
+CATEGORIES_PATH = INPUT_DATA_PATH / "category_keywords.txt"
+# Article names
+ARTICLES_PATH = INPUT_DATA_PATH / "article_keywords.txt"
 
-# Shop URLs
-SHOPS_PATH = Path(__file__).parent / "shops.txt"
-with open(SHOPS_PATH, "r") as f:
-    SHOPS = []
-    for line in f:
-        if line.strip() and not line.strip().startswith("#"):
-            url, kind = line.split("=")
-            SHOPS.append((url.strip(), kind.strip()))
-    SHOPS = tuple(SHOPS)
-
-# Dictionary to save output in.
-COLLECTED_DATA: dict[str, dict] = {
-    shop[0]: {"kind": shop[1], "categorys": {}} for shop in SHOPS
+# Whitelisted chain names
+CHAINS = {
+    "edeka": EdekaProcessor(),
+    "aldi": None,
+    "lidl": None,
+    "rewe": None,
+    "netto": None,
+    "penny": None,
 }
+
+# Cron schedule timezone
+CRON_SCHEDULE_TIMEZONE = "Europe/Berlin"
+# Webscrape cron schedule (every monday at 0 00:00)
+WEBSCRAPE_CRON_SCHEDULE = "0 0 * * 1"

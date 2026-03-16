@@ -51,7 +51,7 @@ Then activate the virtual environment:
 Install the required dependencies:
 
 ```bash
-pip install .
+pip install --editable . --group dev
 ```
 
 ### Running Dagster

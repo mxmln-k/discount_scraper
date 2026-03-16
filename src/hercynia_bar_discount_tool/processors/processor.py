@@ -1,30 +1,46 @@
+import os
+from typing import Iterable
 from abc import ABC, abstractmethod
 
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
-from hercynia_bar_discount_tool.constants import PAGE_LOAD_TIMEOUT_SECONDS, USER_AGENT
 
 class Processor(ABC):
     def __init__(self):
         self.options = Options()
         self.options.add_argument("--headless")
         self.options.add_argument("window-size=1920,1080")
+        self.options.add_argument(
+            f"user-agent={os.getenv("USER_AGENT")}"
+        )  # helps most of the time if headless mode is blocked
         # self.chrome_options.add_argument("--ignore-certificate-errors")
         # self.chrome_options.add_argument("--allow-running-insecure-content")
-        self.options.add_argument(
-            f"user-agent={USER_AGENT}"
-        )  # helps most of the time if headless mode is blocked
 
     def _open_browser_window(self, url: str) -> WebDriver:
         driver: WebDriver = webdriver.Chrome(options=self.options)
         driver.get(url)
-        driver.set_page_load_timeout(PAGE_LOAD_TIMEOUT_SECONDS)
+        driver.set_page_load_timeout(float(os.getenv("PAGE_LOAD_TIMEOUT_SECONDS")))
         return driver
 
-    def _quit_driver(self, driver) -> None:
-        driver.quit()
-
     @abstractmethod
-    def process(self, url: str) -> dict | None: ...
+    def _run_processing(
+        self,
+        driver: WebDriver,
+        category_keywords: Iterable[str] | None,
+        article_keywords: Iterable[str] | None,
+    ) -> dict[str, dict[str, list[str]]] | None: ...
+
+    def process(
+        self,
+        url: str,
+        category_keywords: Iterable[str] | None = None,
+        article_keywords: Iterable[str] | None = None,
+    ) -> dict[str, dict[str, list[str]]] | None:
+        driver = self._open_browser_window(url)
+
+        result = self._run_processing(driver, category_keywords, article_keywords)
+
+        driver.quit()
+        return result
