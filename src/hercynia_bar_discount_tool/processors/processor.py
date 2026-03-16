@@ -6,6 +6,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
+from hercynia_bar_discount_tool.data.webprocessing_result import WebprocessingResult
+
 
 class Processor(ABC):
     def __init__(self):
@@ -27,20 +29,24 @@ class Processor(ABC):
     @abstractmethod
     def _run_processing(
         self,
+        shop_name: str,
         driver: WebDriver,
         category_keywords: Iterable[str] | None,
         article_keywords: Iterable[str] | None,
-    ) -> dict[str, dict[str, list[str]]] | None: ...
+    ) -> WebprocessingResult | None: ...
 
     def process(
         self,
-        url: str,
+        shop_name: str,
+        shop_url: str,
         category_keywords: Iterable[str] | None = None,
         article_keywords: Iterable[str] | None = None,
-    ) -> dict[str, dict[str, list[str]]] | None:
-        driver = self._open_browser_window(url)
+    ) -> WebprocessingResult | None:
+        driver = self._open_browser_window(shop_url)
 
-        result = self._run_processing(driver, category_keywords, article_keywords)
+        result = self._run_processing(
+            shop_name, driver, category_keywords, article_keywords
+        )
 
         driver.quit()
         return result

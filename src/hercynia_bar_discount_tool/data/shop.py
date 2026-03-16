@@ -12,10 +12,3 @@ class Shop:
     @property
     def processor(self) -> Processor:
         return CHAINS[self.chain_name.lower()]
-
-    def as_dict(self) -> dict[str, str]:
-        return self.__dict__
-
-    @classmethod
-    def from_dict(cls, in_dict: dict[str, str]) -> "Shop":
-        return cls(**in_dict)

@@ -4,6 +4,11 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 
+from hercynia_bar_discount_tool.data.webprocessing_result import (
+    Webarticle,
+    Webcategory,
+    WebprocessingResult,
+)
 from hercynia_bar_discount_tool.processors.processor import Processor
 from hercynia_bar_discount_tool.helpers import (
     get_joined_textsubnodes_text,
@@ -51,50 +56,58 @@ class EdekaProcessor(Processor):
         driver: WebDriver,
         article: WebElement,
         article_keywords: Iterable[str] | None,
-        category_data: dict,
-    ) -> None:
-        article_name_text = get_joined_textsubnodes_text(
+    ) -> Webarticle | None:
+        name = get_joined_textsubnodes_text(
             driver, article.find_element(by=By.XPATH, value=".//h4/a")
         )
 
-        if not match_keywords(article_name_text, article_keywords):
-            return
+        if not match_keywords(name, article_keywords):
+            return None
 
-        category_data[article_name_text] = []
+        webarticle = Webarticle(name, [])
 
         article_prices = self._get_article_prices(driver, article)
-        category_data[article_name_text].extend(article_prices)
+        if article_prices:
+            webarticle.info.extend(article_prices)
 
         article_payback = self._get_article_payback(driver, article)
         if article_payback:
-            category_data[article_name_text].append(article_payback)
+            webarticle.info.append(article_payback)
+
+        return webarticle
 
     def _parse_category(
         self,
         driver: WebDriver,
         category: WebElement,
-        category_name: str,
+        category_keywords: Iterable[str] | None,
         article_keywords: Iterable[str] | None,
-        data: dict[str, dict[str, list[str]]],
-    ) -> None:
+    ) -> Webcategory | None:
         # entries hidden only to user and displayed by "load more",
         # but always present in html
+
+        name = category.get_attribute("id")
+
+        if not match_keywords(name, category_keywords):
+            return None
+
         articles = category.find_elements(by=By.XPATH, value="load-more/ul/li/article")
 
-        if articles:
-            data[category_name] = {}
+        webcategory = Webcategory(name, [])
+        for article in articles:
+            webarticle = self._parse_article(driver, article, article_keywords)
+            if webarticle:
+                webcategory.contents.append(webarticle)
 
-            for article in articles:
-                self._parse_article(
-                    driver, article, article_keywords, data[category_name]
-                )
+        return webcategory
 
     def _run_processing(
         self,
+        shop_name: str,
         driver: WebDriver,
         category_keywords: Iterable[str] | None,
         article_keywords: Iterable[str] | None,
-    ) -> dict[str, dict[str, list[str]]] | None:
+    ) -> WebprocessingResult | None:
 
         if not self._check_for_discount_period():
             return None
@@ -103,12 +116,12 @@ class EdekaProcessor(Processor):
             by=By.XPATH, value="//filter-results//ul[@id='filter-results-list']/li"
         )
 
-        parsed_data: dict[str, dict[str, list[str]]] = {}
+        result = WebprocessingResult(shop_name, [])
         for category in categorys:
-            name = category.get_attribute("id")
-            if match_keywords(name, category_keywords):
-                self._parse_category(
-                    driver, category, name, article_keywords, parsed_data
-                )
+            webcategory = self._parse_category(
+                driver, category, category_keywords, article_keywords
+            )
+            if webcategory:
+                result.categories.append(webcategory)
 
-        return parsed_data
+        return result

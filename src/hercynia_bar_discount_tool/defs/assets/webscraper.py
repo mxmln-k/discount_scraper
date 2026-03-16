@@ -1,12 +1,11 @@
-import json
 import time
+from dataclasses import asdict
 import dagster as dg
 from hercynia_bar_discount_tool.defs.assets.user_input import (
     shop_information,
     category_keywords,
     article_keywords,
 )
-from hercynia_bar_discount_tool.data.shop import Shop
 
 __GROUP_NAME__ = "webscraping"
 
@@ -16,22 +15,24 @@ __GROUP_NAME__ = "webscraping"
     deps=[shop_information, category_keywords, article_keywords],
 )
 def webscrape(
-    shop_information: tuple,
+    shop_information: list,
     category_keywords: tuple,
     article_keywords: tuple,
 ) -> dg.MaterializeResult:
     t_start = time.time()
 
+    results = []
     for shop in shop_information:
-        shop = Shop.from_dict(json.loads(shop))
         try:
             result = shop.processor.process(
-                shop.offers_url, category_keywords, article_keywords
+                shop.shop_name, shop.offers_url, category_keywords, article_keywords
             )
+            if result:
+                results.append(result)
         except:
-            result = None
+            pass
 
     t_taken = time.time() - t_start
     return dg.MaterializeResult(
-        value=result, metadata={"time_taken": t_taken, "data": result}
+        value=results, metadata={"time_taken": t_taken, "data": [asdict(result) for result in results]}
     )
