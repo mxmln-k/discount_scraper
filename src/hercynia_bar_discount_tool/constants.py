@@ -9,6 +9,8 @@ SHOPS_PATH = INPUT_DATA_PATH / "shops.csv"
 CATEGORIES_PATH = INPUT_DATA_PATH / "category_keywords.txt"
 # Article names
 ARTICLES_PATH = INPUT_DATA_PATH / "article_keywords.txt"
+# Recipient emails
+RECIPIENT_EMAILS_PATH = INPUT_DATA_PATH / "recipient_mail_addresses.txt"
 
 # Whitelisted chain names
 CHAINS = {

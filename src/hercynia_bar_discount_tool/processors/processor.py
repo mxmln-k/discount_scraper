@@ -1,4 +1,3 @@
-import os
 from typing import Iterable
 from abc import ABC, abstractmethod
 
@@ -7,6 +6,10 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
 from hercynia_bar_discount_tool.data.webprocessing_result import WebprocessingResult
+from hercynia_bar_discount_tool.webscrape_constants import (
+    USER_AGENT,
+    PAGE_LOAD_TIMEOUT_SECONDS,
+)
 
 
 class Processor(ABC):
@@ -15,7 +18,7 @@ class Processor(ABC):
         self.options.add_argument("--headless")
         self.options.add_argument("window-size=1920,1080")
         self.options.add_argument(
-            f"user-agent={os.getenv("USER_AGENT")}"
+            f"user-agent={USER_AGENT}"
         )  # helps most of the time if headless mode is blocked
         # self.chrome_options.add_argument("--ignore-certificate-errors")
         # self.chrome_options.add_argument("--allow-running-insecure-content")
@@ -23,7 +26,7 @@ class Processor(ABC):
     def _open_browser_window(self, url: str) -> WebDriver:
         driver: WebDriver = webdriver.Chrome(options=self.options)
         driver.get(url)
-        driver.set_page_load_timeout(float(os.getenv("PAGE_LOAD_TIMEOUT_SECONDS")))
+        driver.set_page_load_timeout(float(PAGE_LOAD_TIMEOUT_SECONDS))
         return driver
 
     @abstractmethod
@@ -44,9 +47,12 @@ class Processor(ABC):
     ) -> WebprocessingResult | None:
         driver = self._open_browser_window(shop_url)
 
-        result = self._run_processing(
-            shop_name, driver, category_keywords, article_keywords
-        )
+        try:
+            result = self._run_processing(
+                shop_name, driver, category_keywords, article_keywords
+            )
+        except:
+            result = WebprocessingResult(shop_name, [], False)
 
         driver.quit()
         return result

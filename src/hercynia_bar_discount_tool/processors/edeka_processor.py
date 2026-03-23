@@ -97,7 +97,7 @@ class EdekaProcessor(Processor):
         for article in articles:
             webarticle = self._parse_article(driver, article, article_keywords)
             if webarticle:
-                webcategory.contents.append(webarticle)
+                webcategory.offers.append(webarticle)
 
         return webcategory
 
@@ -116,7 +116,7 @@ class EdekaProcessor(Processor):
             by=By.XPATH, value="//filter-results//ul[@id='filter-results-list']/li"
         )
 
-        result = WebprocessingResult(shop_name, [])
+        result = WebprocessingResult(shop_name, [], True)
         for category in categorys:
             webcategory = self._parse_category(
                 driver, category, category_keywords, article_keywords
