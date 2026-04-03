@@ -15,6 +15,19 @@ __GROUP_NAME__ = "webscraping"
 WEBSCRAPE_ASSETS = []
 ASSET_CHECKS = []
 
+__DG_NAME_REPLACEMENT_TABLE__ = str.maketrans(
+    {
+        " ": "_",
+        "-": "_",
+        "ä": "ae",
+        "Ä": "Ae",
+        "ö": "oe",
+        "Ö": "Oe",
+        "ü": "ue",
+        "Ü": "Ue",
+    }
+)
+
 
 def create_webscrape_assets():
     store_information = get_store_information(STORES_PATH)
@@ -22,7 +35,7 @@ def create_webscrape_assets():
     article_kwds = get_kwds(ARTICLES_PATH)
 
     for store in store_information:
-        store_name = store.store_name.replace(" ", "_")
+        store_name = store.store_name.translate(__DG_NAME_REPLACEMENT_TABLE__)
 
         @dg.asset(
             name=store_name,
