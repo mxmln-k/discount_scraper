@@ -1,4 +1,3 @@
-from discount_scraper.constants import CHAINS
 from discount_scraper.processors.edeka_processor import EdekaProcessor
 from discount_scraper.processors.kaufland_processor import KauflandProcessor
 from discount_scraper.processors.processor import Processor
