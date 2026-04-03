@@ -8,8 +8,6 @@ Scrapes current discounts in local supermarket from their websites, packages the
 
 **Option 1: Makefile**
 
-#### Using Makefile
-
 If your setup supports makefiles just run the following command:
 
 ```bash
