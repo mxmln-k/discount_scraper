@@ -4,10 +4,10 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import dagster as dg
+from discount_scraper.data.webprocessing_result import WebprocessingResult
 from discount_scraper.user_input import get_mail_addresses
 from discount_scraper.constants import RECIPIENT_EMAILS_PATH
 from discount_scraper.defs.assets.webscraper import WEBSCRAPE_ASSETS
-from discount_scraper.helpers import parse
 
 __GROUP_NAME__ = "mail"
 RECIPIENT_MAIL_ADDRESSES = get_mail_addresses(RECIPIENT_EMAILS_PATH)
@@ -24,8 +24,8 @@ def mail_message(**upstream_values) -> dg.MaterializeResult:
     msg["To"] = ",".join(RECIPIENT_MAIL_ADDRESSES)
 
     upstream_values = list(upstream_values.values())
-    plain_text = parse(upstream_values, "plain")
-    html_text = parse(upstream_values, "html")
+    plain_text = WebprocessingResult.parse(upstream_values, "plain")
+    html_text = WebprocessingResult.parse(upstream_values, "html")
 
     plain_text_mime = MIMEText(plain_text, "plain")
     html_text_mime = MIMEText(html_text, "html")
