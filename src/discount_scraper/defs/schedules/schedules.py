@@ -11,4 +11,5 @@ webscrape_schedule = dg.ScheduleDefinition(
     job=webscrape_job,
     execution_timezone=CRON_SCHEDULE_TIMEZONE,
     cron_schedule=WEBSCRAPE_CRON_SCHEDULE,
+    default_status=dg.DefaultScheduleStatus.RUNNING,
 )
