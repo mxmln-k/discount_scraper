@@ -1,5 +1,5 @@
 from pathlib import Path
-from hercynia_bar_discount_tool.processors.edeka_processor import EdekaProcessor
+from discount_scraper.processors.edeka_processor import EdekaProcessor
 
 # Input data path
 INPUT_DATA_PATH = Path(__file__).parent.parent.parent / "input_data"

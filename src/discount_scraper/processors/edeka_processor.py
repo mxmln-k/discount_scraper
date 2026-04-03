@@ -4,13 +4,13 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from hercynia_bar_discount_tool.data.webprocessing_result import (
+from discount_scraper.data.webprocessing_result import (
     Webarticle,
     Webcategory,
     WebprocessingResult,
 )
-from hercynia_bar_discount_tool.processors.processor import Processor
-from hercynia_bar_discount_tool.helpers import (
+from discount_scraper.processors.processor import Processor
+from discount_scraper.helpers import (
     get_joined_textsubnodes_text,
     match_keywords,
 )

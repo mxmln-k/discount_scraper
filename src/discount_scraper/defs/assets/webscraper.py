@@ -1,8 +1,8 @@
 import time, datetime
 from dataclasses import asdict
 import dagster as dg
-from hercynia_bar_discount_tool.user_input import get_shop_information, get_kwds
-from hercynia_bar_discount_tool.constants import (
+from discount_scraper.user_input import get_shop_information, get_kwds
+from discount_scraper.constants import (
     SHOPS_PATH,
     CATEGORIES_PATH,
     ARTICLES_PATH,

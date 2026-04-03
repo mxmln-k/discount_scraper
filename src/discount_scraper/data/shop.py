@@ -1,5 +1,5 @@
-from hercynia_bar_discount_tool.constants import CHAINS
-from hercynia_bar_discount_tool.processors.processor import Processor
+from discount_scraper.constants import CHAINS
+from discount_scraper.processors.processor import Processor
 
 
 class Shop:

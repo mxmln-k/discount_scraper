@@ -4,10 +4,10 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import dagster as dg
-from hercynia_bar_discount_tool.user_input import get_mail_addresses
-from hercynia_bar_discount_tool.constants import RECIPIENT_EMAILS_PATH
-from hercynia_bar_discount_tool.defs.assets.webscraper import WEBSCRAPE_ASSETS
-from hercynia_bar_discount_tool.helpers import parse
+from discount_scraper.user_input import get_mail_addresses
+from discount_scraper.constants import RECIPIENT_EMAILS_PATH
+from discount_scraper.defs.assets.webscraper import WEBSCRAPE_ASSETS
+from discount_scraper.helpers import parse
 
 __GROUP_NAME__ = "mail"
 RECIPIENT_MAIL_ADDRESSES = get_mail_addresses(RECIPIENT_EMAILS_PATH)

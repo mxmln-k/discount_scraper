@@ -5,8 +5,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
-from hercynia_bar_discount_tool.data.webprocessing_result import WebprocessingResult
-from hercynia_bar_discount_tool.webscrape_constants import (
+from discount_scraper.data.webprocessing_result import WebprocessingResult
+from discount_scraper.webscrape_constants import (
     USER_AGENT,
     PAGE_LOAD_TIMEOUT_SECONDS,
 )

@@ -2,8 +2,8 @@ from typing import Iterable, Literal
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 
-from hercynia_bar_discount_tool.data.webprocessing_result import WebprocessingResult
-from hercynia_bar_discount_tool.email_templates import TEMPLATES
+from discount_scraper.data.webprocessing_result import WebprocessingResult
+from discount_scraper.email_templates import TEMPLATES
 
 
 def get_tag_text(webelement: WebElement) -> str:

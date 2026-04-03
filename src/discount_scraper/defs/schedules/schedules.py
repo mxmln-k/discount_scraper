@@ -1,6 +1,6 @@
 import dagster as dg
-from hercynia_bar_discount_tool.defs.jobs.jobs import webscrape_job
-from hercynia_bar_discount_tool.constants import (
+from discount_scraper.defs.jobs.jobs import webscrape_job
+from discount_scraper.constants import (
     CRON_SCHEDULE_TIMEZONE,
     WEBSCRAPE_CRON_SCHEDULE,
 )

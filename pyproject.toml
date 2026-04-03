@@ -1,5 +1,5 @@
 [project]
-name = "hercynia_bar_discount_tool"
+name = "discount_scraper"
 requires-python = ">=3.10,<3.15"
 version = "0.1.0"
 dependencies = [
@@ -26,9 +26,9 @@ force-include = { "pyproject.toml" = "pyproject.toml" }
 directory_type = "project"
 
 [tool.dg.project]
-root_module = "hercynia_bar_discount_tool"
+root_module = "discount_scraper"
 registry_modules = [
-    "hercynia_bar_discount_tool.components.*",
+    "discount_scraper.components.*",
 ]
 
 

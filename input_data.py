@@ -1,5 +1,5 @@
 import dagster as dg
-from hercynia_bar_discount_tool.constants import SHOPS_PATH
+from discount_scraper.constants import SHOPS_PATH
 
 
 @dg.assets

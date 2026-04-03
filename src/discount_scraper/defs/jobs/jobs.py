@@ -2,7 +2,7 @@ import dagster as dg
 from dagster._core.definitions.unresolved_asset_job_definition import (
     UnresolvedAssetJobDefinition,
 )
-from hercynia_bar_discount_tool.defs.assets.mail import send_mail
+from discount_scraper.defs.assets.mail import send_mail
 
 
 webscrape_job: UnresolvedAssetJobDefinition = dg.define_asset_job(

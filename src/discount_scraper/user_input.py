@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from hercynia_bar_discount_tool.data.shop import Shop
+from discount_scraper.data.shop import Shop
 
 __GROUP_NAME__ = "user_input"
 
