@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Iterable
 from abc import ABC, abstractmethod
 
@@ -32,27 +33,39 @@ class Processor(ABC):
     @abstractmethod
     def _run_processing(
         self,
-        shop_name: str,
+        store_name: str,
+        store_id: str,
         driver: WebDriver,
+        week_start: date,
+        week_end: date,
         category_keywords: Iterable[str] | None,
         article_keywords: Iterable[str] | None,
     ) -> WebprocessingResult | None: ...
 
     def process(
         self,
-        shop_name: str,
-        shop_url: str,
+        store_name: str,
+        store_url: str,
+        store_id: str,
+        week_start: date,
+        week_end: date,
         category_keywords: Iterable[str] | None = None,
         article_keywords: Iterable[str] | None = None,
     ) -> WebprocessingResult | None:
         result = None
 
         try:
-            driver = self._open_browser_window(shop_url)
+            driver = self._open_browser_window(store_url)
 
             try:
                 result = self._run_processing(
-                    shop_name, driver, category_keywords, article_keywords
+                    store_name=store_name,
+                    store_id=store_id,
+                    driver=driver,
+                    week_start=week_start,
+                    week_end=week_end,
+                    category_keywords=category_keywords,
+                    article_keywords=article_keywords,
                 )
             except Exception:
                 pass
@@ -62,6 +75,6 @@ class Processor(ABC):
             pass
 
         if result is None:
-            result = WebprocessingResult(shop_name, [], False)
+            result = WebprocessingResult(store_name, [], False)
 
         return result

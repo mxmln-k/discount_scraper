@@ -1,26 +1,15 @@
 from pathlib import Path
-from discount_scraper.processors.edeka_processor import EdekaProcessor
 
 # Input data path
 INPUT_DATA_PATH = Path(__file__).parent.parent.parent / "input_data"
-# Shop URLs path
-SHOPS_PATH = INPUT_DATA_PATH / "shops.csv"
+# Store URLs path
+STORES_PATH = INPUT_DATA_PATH / "stores.csv"
 # Categories names
 CATEGORIES_PATH = INPUT_DATA_PATH / "category_keywords.txt"
 # Article names
 ARTICLES_PATH = INPUT_DATA_PATH / "article_keywords.txt"
 # Recipient emails
 RECIPIENT_EMAILS_PATH = INPUT_DATA_PATH / "recipient_mail_addresses.txt"
-
-# Whitelisted chain names
-CHAINS = {
-    "edeka": EdekaProcessor(),
-    "aldi": None,
-    "lidl": None,
-    "rewe": None,
-    "netto": None,
-    "penny": None,
-}
 
 # Cron schedule timezone
 CRON_SCHEDULE_TIMEZONE = "Europe/Berlin"

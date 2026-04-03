@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Iterable
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -20,8 +21,32 @@ class EdekaProcessor(Processor):
     def __init__(self):
         super().__init__()
 
-    def _check_for_discount_period(self) -> bool:
-        return True
+    def _check_offer_period(
+        self,
+        driver: WebDriver,
+        week_start: date,
+        week_end: date,
+    ) -> bool | None:
+
+        date_elements = driver.find_elements(
+            by=By.XPATH, value="//filter-results//div[@class='mb-5']/p/strong"
+        )
+
+        for date_element in date_elements:
+            try:
+                date_text = get_joined_textsubnodes_text(driver, date_element)
+                date_ = date.strptime(date_text, "%d.%m.%Y")
+
+                # check that first date is in week
+                if week_start <= date_ <= week_end:
+                    return True
+                else:
+                    return False
+
+            except Exception:
+                pass
+
+        return None
 
     def _get_article_prices(self, driver: WebDriver, article: WebElement) -> list[str]:
         article_price_list = article.find_elements(
@@ -103,25 +128,38 @@ class EdekaProcessor(Processor):
 
     def _run_processing(
         self,
-        shop_name: str,
+        store_name: str,
+        store_id: str,
         driver: WebDriver,
+        week_start: date,
+        week_end: date,
         category_keywords: Iterable[str] | None,
         article_keywords: Iterable[str] | None,
     ) -> WebprocessingResult | None:
 
-        if not self._check_for_discount_period():
+        period_valid = self._check_offer_period(driver, week_start, week_end)
+        if period_valid == False:
             return None
+        else:
+            period_verified = period_valid == True
 
-        categorys = driver.find_elements(
+        categories = driver.find_elements(
             by=By.XPATH, value="//filter-results//ul[@id='filter-results-list']/li"
         )
 
-        result = WebprocessingResult(shop_name, [], True)
-        for category in categorys:
+        result_categories = []
+        for category in categories:
             webcategory = self._parse_category(
                 driver, category, category_keywords, article_keywords
             )
             if webcategory:
-                result.categories.append(webcategory)
+                result_categories.append(webcategory)
+
+        result = WebprocessingResult(
+            store_name=store_name,
+            categories=result_categories,
+            period_verified=period_verified,
+            success=True,
+        )
 
         return result

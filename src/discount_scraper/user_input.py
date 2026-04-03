@@ -1,21 +1,21 @@
 import csv
 from pathlib import Path
-from discount_scraper.data.shop import Shop
+from discount_scraper.data.store import Store
 
 __GROUP_NAME__ = "user_input"
 
 
-def get_shop_information(path: Path, encoding: str | None = None) -> list[Shop]:
-    shops: list[Shop] = []
+def get_store_information(path: Path, encoding: str | None = None) -> list[Store]:
+    stores: list[Store] = []
     with open(path, "r", encoding=encoding) as f:
         reader = csv.reader(f, delimiter=";")
         next(reader)  # skip header
 
         for row in reader:
-            shop = Shop(*row)
-            shops.append(shop)
+            store = Store(*row)
+            stores.append(store)
 
-    return shops
+    return stores
 
 
 def get_kwds(path: Path, encoding: str | None = None) -> tuple[str, ...]:

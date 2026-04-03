@@ -1,13 +1,12 @@
 import time
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from dataclasses import asdict
-from typing import Callable
 import dagster as dg
-from discount_scraper.data.shop import Shop
+from discount_scraper.data.store import Store
 from discount_scraper.data.webprocessing_result import WebprocessingResult
-from discount_scraper.user_input import get_shop_information, get_kwds
+from discount_scraper.user_input import get_store_information, get_kwds
 from discount_scraper.constants import (
-    SHOPS_PATH,
+    STORES_PATH,
     CATEGORIES_PATH,
     ARTICLES_PATH,
 )
@@ -18,21 +17,31 @@ ASSET_CHECKS = []
 
 
 def create_webscrape_assets():
-    shop_information = get_shop_information(SHOPS_PATH)
+    store_information = get_store_information(STORES_PATH)
     category_kwds = get_kwds(CATEGORIES_PATH)
     article_kwds = get_kwds(ARTICLES_PATH)
 
-    for shop in shop_information:
-        shop_name = shop.shop_name.replace(" ", "_")
+    for store in store_information:
+        store_name = store.store_name.replace(" ", "_")
 
         @dg.asset(
-            name=shop_name,
+            name=store_name,
             group_name=__GROUP_NAME__,
         )
-        def webscrape(*, shop: Shop = shop) -> dg.MaterializeResult:
+        def webscrape(*, store: Store = store) -> dg.MaterializeResult:
+            today = date.today()
+            week_start = today - timedelta(days=date.weekday(today))
+            week_end = week_start + timedelta(days=6)
+
             t_start = time.time()
-            result = shop.processor.process(
-                shop.shop_name, shop.offers_url, category_kwds, article_kwds
+            result = store.processor.process(
+                store_name=store.store_name,
+                store_url=store.offers_url,
+                store_id=store.store_id,
+                week_start=week_start,
+                week_end=week_end,
+                category_keywords=category_kwds,
+                article_keywords=article_kwds,
             )
             t_taken = time.time() - t_start
 
@@ -47,8 +56,8 @@ def create_webscrape_assets():
             )
 
         @dg.asset_check(
-            name=f"{shop_name}_success",
-            asset=shop_name,
+            name=f"{store_name}_success",
+            asset=store_name,
         )
         def check_success(result: WebprocessingResult) -> dg.AssetCheckResult:
             return dg.AssetCheckResult(passed=result.success)

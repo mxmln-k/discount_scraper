@@ -18,7 +18,7 @@ class Webcategory:
 
 @dataclass(frozen=True)
 class WebprocessingResult:
-    shop_name: str
+    store_name: str
     categories: list[Webcategory]
     period_verified: bool
     success: bool
