@@ -1,3 +1,4 @@
+import re
 import time
 from datetime import datetime, date, timedelta
 from dataclasses import asdict
@@ -15,10 +16,8 @@ __GROUP_NAME__ = "webscraping"
 WEBSCRAPE_ASSETS = []
 ASSET_CHECKS = []
 
-__DG_NAME_REPLACEMENT_TABLE__ = str.maketrans(
+__DG_GERMAN_LETTER_REPLACEMENT_TABLE__ = str.maketrans(
     {
-        " ": "_",
-        "-": "_",
         "ä": "ae",
         "Ä": "Ae",
         "ö": "oe",
@@ -27,6 +26,13 @@ __DG_NAME_REPLACEMENT_TABLE__ = str.maketrans(
         "Ü": "Ue",
     }
 )
+__DG_NONWORD_REPLACEMENT_REGEX__ = re.compile("\W+")
+
+
+def get_dg_name(name: str) -> str:
+    name = name.translate(__DG_GERMAN_LETTER_REPLACEMENT_TABLE__)
+    name = re.sub(__DG_NONWORD_REPLACEMENT_REGEX__, "_", name)
+    return name
 
 
 def create_webscrape_assets():
@@ -35,7 +41,7 @@ def create_webscrape_assets():
     article_kwds = get_kwds(ARTICLES_PATH)
 
     for store in store_information:
-        store_name = store.store_name.translate(__DG_NAME_REPLACEMENT_TABLE__)
+        store_name = get_dg_name(store.store_name)
 
         @dg.asset(
             name=store_name,
