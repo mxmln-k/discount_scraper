@@ -73,6 +73,21 @@ class KauflandProcessor(Processor):
             pass
 
         return article_price
+    
+    def _get_article_name(self, driver: WebDriver, text_element: WebElement) -> str:
+        title_elements = text_element.find_elements(
+            by=By.XPATH, value="./div[@class='k-product-tile__title']"
+        )
+        subtitle_elements = text_element.find_elements(
+            by=By.XPATH, value="./div[@class='k-product-tile__subtitle']"
+        )
+        name_elements = title_elements + subtitle_elements
+
+        name = " ".join(
+            get_joined_textsubnodes_text(driver, e) for e in name_elements
+        )
+
+        return name
 
     def _parse_article(
         self,
@@ -85,17 +100,7 @@ class KauflandProcessor(Processor):
             value=".//div[@class='k-product-tile__main']/div[@class='k-product-tile__text']",
         )
 
-        title_elements = text_element.find_elements(
-            by=By.XPATH, value="./div[@class='k-product-tile__title']"
-        )
-        subtitle_elements = text_element.find_elements(
-            by=By.XPATH, value="./div[@class='k-product-tile__subtitle']"
-        )
-        name_elements = title_elements + subtitle_elements
-
-        name = " ".join(
-            get_joined_textsubnodes_text(driver, e) for e in name_elements
-        )
+        name = self._get_article_name(driver, text_element)
 
         if not match_keywords(name, article_keywords):
             return None

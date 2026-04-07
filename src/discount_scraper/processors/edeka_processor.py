@@ -57,6 +57,19 @@ class EdekaProcessor(Processor):
 
             return article_price_strings
         return []
+    
+    def _get_article_additional_info(self, driver: WebDriver, article: WebElement) -> str | None:
+        try:
+            article_additional_info_element = article.find_element(
+                by=By.XPATH, value=".//p[@class='line-clamp-2']"
+            )
+            article_additional_info = get_joined_textsubnodes_text(
+                driver, article_additional_info_element
+            )
+
+            return article_additional_info
+        except NoSuchElementException:
+            return None
 
     def _get_article_payback(
         self, driver: WebDriver, article: WebElement
@@ -89,6 +102,9 @@ class EdekaProcessor(Processor):
         webarticle = Webarticle(name, [])
 
         article_prices = self._get_article_prices(driver, article)
+        additional_info = self._get_article_additional_info(driver, article)
+        if additional_info:
+            article_prices = [article_price + " " + additional_info for article_price in article_prices]
         if article_prices:
             webarticle.info.extend(article_prices)
 
@@ -113,7 +129,7 @@ class EdekaProcessor(Processor):
         if not match_keywords(name, category_keywords):
             return None
 
-        articles = category.find_elements(by=By.XPATH, value="load-more/ul/li/article")
+        articles = category.find_elements(by=By.XPATH, value="./load-more/ul/li/article")
 
         webcategory = Webcategory(name, [])
         for article in articles:
