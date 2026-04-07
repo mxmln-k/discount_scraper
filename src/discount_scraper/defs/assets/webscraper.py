@@ -26,7 +26,7 @@ __DG_GERMAN_LETTER_REPLACEMENT_TABLE__ = str.maketrans(
         "Ü": "Ue",
     }
 )
-__DG_NONWORD_REPLACEMENT_REGEX__ = re.compile("\W+")
+__DG_NONWORD_REPLACEMENT_REGEX__ = re.compile(r"\W+")
 
 
 def get_dg_name(name: str) -> str:
