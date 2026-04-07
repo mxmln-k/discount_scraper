@@ -47,7 +47,9 @@ class KauflandProcessor(Processor):
         # check that date is in week
         return week_start <= date_ <= week_end
 
-    def _get_article_pricing(self, driver: WebDriver, article: WebElement, text_element: WebElement) -> str | None:
+    def _get_article_pricing(
+        self, driver: WebDriver, article: WebElement, text_element: WebElement
+    ) -> str | None:
         try:
             article_price_element = article.find_element(
                 by=By.XPATH,
@@ -56,24 +58,28 @@ class KauflandProcessor(Processor):
             article_price = get_joined_textsubnodes_text(driver, article_price_element)
         except Exception:
             return None
-        
+
         try:
             unit_price_element = text_element.find_element(
                 by=By.XPATH, value="./div[@class='k-product-tile__unit-price']"
             )
-            article_price += " " + get_joined_textsubnodes_text(driver, unit_price_element)
+            article_price += " " + get_joined_textsubnodes_text(
+                driver, unit_price_element
+            )
         except NoSuchElementException:
             pass
         try:
             base_price_element = text_element.find_element(
                 by=By.XPATH, value="./div[@class='k-product-tile__base-price']"
             )
-            article_price += " " + get_joined_textsubnodes_text(driver, base_price_element)
+            article_price += " " + get_joined_textsubnodes_text(
+                driver, base_price_element
+            )
         except NoSuchElementException:
             pass
 
         return article_price
-    
+
     def _get_article_name(self, driver: WebDriver, text_element: WebElement) -> str:
         title_elements = text_element.find_elements(
             by=By.XPATH, value="./div[@class='k-product-tile__title']"
@@ -83,9 +89,7 @@ class KauflandProcessor(Processor):
         )
         name_elements = title_elements + subtitle_elements
 
-        name = " ".join(
-            get_joined_textsubnodes_text(driver, e) for e in name_elements
-        )
+        name = " ".join(get_joined_textsubnodes_text(driver, e) for e in name_elements)
 
         return name
 
