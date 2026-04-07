@@ -53,6 +53,7 @@ class Processor(ABC):
         article_keywords: Iterable[str] | None = None,
     ) -> WebprocessingResult | None:
         result = None
+        exception = None
 
         try:
             driver = self._open_browser_window(store_url)
@@ -67,14 +68,19 @@ class Processor(ABC):
                     category_keywords=category_keywords,
                     article_keywords=article_keywords,
                 )
-            except Exception:
-                pass
+            finally:
+                driver.quit()
 
-            driver.quit()
-        except Exception:
-            pass
+        except Exception as e:
+            exception = str(e)
 
         if result is None:
-            result = WebprocessingResult(store_name, [], False)
+            result = WebprocessingResult(
+                store_name=store_name,
+                categories=[],
+                period_verified=False,
+                success=False,
+                exception=exception,
+            )
 
         return result

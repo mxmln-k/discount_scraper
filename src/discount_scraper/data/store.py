@@ -5,7 +5,7 @@ from discount_scraper.processors.processor import Processor
 
 class Store:
     # Whitelisted chain names
-    CHAINS = {  # TODO: maybe not instantiate yet
+    CHAINS = {
         "edeka": EdekaProcessor(),
         "kaufland": KauflandProcessor(),
         "rewe": None,

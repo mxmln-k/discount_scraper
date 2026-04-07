@@ -38,10 +38,7 @@ class EdekaProcessor(Processor):
                 date_ = date.strptime(date_text, "%d.%m.%Y")
 
                 # check that first date is in week
-                if week_start <= date_ <= week_end:
-                    return True
-                else:
-                    return False
+                return week_start <= date_ <= week_end
 
             except Exception:
                 pass
@@ -147,17 +144,17 @@ class EdekaProcessor(Processor):
             by=By.XPATH, value="//filter-results//ul[@id='filter-results-list']/li"
         )
 
-        result_categories = []
+        category_results = []
         for category in categories:
             webcategory = self._parse_category(
                 driver, category, category_keywords, article_keywords
             )
             if webcategory:
-                result_categories.append(webcategory)
+                category_results.append(webcategory)
 
         result = WebprocessingResult(
             store_name=store_name,
-            categories=result_categories,
+            categories=category_results,
             period_verified=period_verified,
             success=True,
         )
