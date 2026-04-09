@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from typing import Iterable
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import (
@@ -27,13 +27,22 @@ class KauflandProcessor(Processor):
         super().__init__()
 
     def _get_date(self, s: str) -> date | None:
-        s += str(date.today().year)
-        try:
-            d = date.strptime(s, "%d.%m.%Y")
-        except Exception:
-            d = None
+        today = date.today()
 
-        return d
+        current_year = s + str(today.year)
+        next_year = s + str(today.year + 1)
+        try:
+            date_current_year = date.strptime(current_year, "%d.%m.%Y")
+            date_next_year = date.strptime(next_year, "%d.%m.%Y")
+
+            # If date with current year is less than 180 days in the past,
+            # assume it is the correct year, otherwise use next year (for dates around new year)
+            if today - date_current_year < timedelta(days=180):
+                return date_current_year
+            else:
+                return date_next_year
+        except Exception:
+            return None
 
     def _check_offer_period(
         self,
