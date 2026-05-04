@@ -1,34 +1,14 @@
-import csv
 from pathlib import Path
-from discount_scraper.data.store import Store
+import re
+from typing import Any, Callable
 
-__GROUP_NAME__ = "user_input"
+from discount_scraper.constants import normalize_text
 
-
-def get_store_information(path: Path, encoding: str | None = None) -> list[Store]:
-    stores: list[Store] = []
-    with open(path, "r", encoding=encoding) as f:
-        reader = csv.reader(f, delimiter=";")
-        next(reader)  # skip header
-
-        for row in reader:
-            store = Store(*row)
-            stores.append(store)
-
-    return stores
-
-
-def get_kwds(path: Path, encoding: str | None = None) -> tuple[str, ...]:
+def get_list(path: Path, encoding: str | None = None, modify: Callable[[str], Any] = lambda x: x) -> tuple[Any, ...]:
     with open(path, "r", encoding=encoding) as f:
         content = (line.strip() for line in f.readlines())
 
-    keywords = tuple(line.lower() for line in content if line)
-    return keywords
+    return tuple(modify(line) for line in content if line)
 
-
-def get_mail_addresses(path: Path, encoding: str | None = None) -> tuple[str, ...]:
-    with open(path, "r", encoding=encoding) as f:
-        content = (line.strip() for line in f.readlines())
-
-    keywords = tuple(line for line in content if line)
-    return keywords
+def get_kwds(path: Path, encoding: str | None = None) -> tuple[re.Pattern, ...]:
+    return get_list(path, encoding, lambda x: re.compile(rf"\b{normalize_text(x.lower())}\b"))

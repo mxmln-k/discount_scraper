@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from datetime import date
 from typing import Literal
 
-from discount_scraper.email_templates import PERIOD_NOT_VERIFIED, TEMPLATES
+from discount_scraper.email_templates import TEMPLATES
 
 
 @dataclass(frozen=True)
@@ -26,20 +27,19 @@ class Webcategory:
 class WebprocessingResult:
     store_name: str
     categories: list[Webcategory]
-    period_verified: bool
+    offer_end_date: date | None
     success: bool
     exception: str | None = None
 
-    @staticmethod
-    def parse(wprs: list[WebprocessingResult], kind: Literal["plain", "html"]) -> str:
+    @classmethod
+    def parse(cls, wprs: list[WebprocessingResult], kind: Literal["plain", "html"]) -> str:
+        wprs = cls.get_filtered_results(wprs)
         return TEMPLATES[kind]["base"].format(
             stores="\n".join(
                 (
                     TEMPLATES[kind]["store"].format(
                         name=(
-                            wpr.store_name
-                            if wpr.period_verified
-                            else f"{wpr.store_name} ({PERIOD_NOT_VERIFIED})"
+                            f"{wpr.store_name} (gültig bis {wpr.offer_end_date.strftime("%d.%m.%Y") if wpr.offer_end_date else "N/A"})"
                         ),
                         categories="\n".join(
                             TEMPLATES[kind]["category"].format(
@@ -64,3 +64,7 @@ class WebprocessingResult:
                 for wpr in wprs
             )
         )
+
+    @staticmethod
+    def get_filtered_results(results: list["WebprocessingResult"]) -> list[Webcategory]:
+        return [result for result in results if result.categories or not result.success]

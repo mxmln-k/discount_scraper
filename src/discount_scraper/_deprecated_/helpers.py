@@ -1,6 +1,7 @@
-import dataclasses
+import time
 from datetime import date
 from typing import Iterable
+from selenium.common import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 
@@ -9,6 +10,33 @@ from discount_scraper.data.webprocessing_result import Webarticle, Webcategory
 
 def get_tag_text(webelement: WebElement) -> str:
     return webelement.get_attribute("outerHTML").split(">")[0] + ">"
+
+
+def get_element_from_shadow_root(
+    driver: ChromeWebDriver,
+    webelement: WebElement,
+    css_selector: str,
+    max_wait_seconds: int = 10,
+) -> WebElement:
+
+    end_time = time.time() + max_wait_seconds
+    while time.time() < end_time:
+        try:
+            element = driver.execute_script(
+                "return arguments[0].shadowRoot.querySelector(arguments[1])",
+                webelement,
+                css_selector,
+            )
+            if element:
+                return element
+        except Exception:
+            pass
+
+        time.sleep(0.25)
+
+    raise NoSuchElementException(
+        f"Element with selector '{css_selector}' not found in shadow root of element '{get_tag_text(webelement)}' within {max_wait_seconds} seconds."
+    )
 
 
 def get_joined_textsubnodes_text(

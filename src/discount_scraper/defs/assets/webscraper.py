@@ -1,18 +1,23 @@
 import re
 import time
-from datetime import datetime, date, timedelta
-from dataclasses import asdict
+from datetime import datetime
+from typing import Generator
 import dagster as dg
-from discount_scraper.data.store import Store
-from discount_scraper.data.webprocessing_result import WebprocessingResult
-from discount_scraper.user_input import get_store_information, get_kwds
+from discount_scraper.processors.kaufda_processor import KaufdaProcessor
+from discount_scraper.user_input import get_kwds, get_list
 from discount_scraper.constants import (
-    STORES_PATH,
     CATEGORIES_PATH,
+    LOCATION_URLS_PATH,
+    STORE_CATEGORIES_PATH,
     ARTICLES_PATH,
 )
 
 __GROUP_NAME__ = "webscraping"
+LOCATION_URLS = get_list(LOCATION_URLS_PATH)
+STORE_CATEGORIES = get_kwds(STORE_CATEGORIES_PATH)
+CATEGORY_KWDS = get_kwds(CATEGORIES_PATH)
+ARTICLE_KWDS = get_kwds(ARTICLES_PATH)
+
 WEBSCRAPE_ASSETS = []
 ASSET_CHECKS = []
 
@@ -29,60 +34,76 @@ __DG_GERMAN_LETTER_REPLACEMENT_TABLE__ = str.maketrans(
 __DG_NONWORD_REPLACEMENT_REGEX__ = re.compile(r"\W+")
 
 
-def get_dg_name(name: str) -> str:
-    name = name.translate(__DG_GERMAN_LETTER_REPLACEMENT_TABLE__)
-    name = re.sub(__DG_NONWORD_REPLACEMENT_REGEX__, "_", name)
-    return name
+def get_hash_value(name: str) -> str:
+    # Normalize the name: lowercase, replace German letters, remove non-word chars
+    normalized = name.lower().translate(__DG_GERMAN_LETTER_REPLACEMENT_TABLE__)
+    normalized = __DG_NONWORD_REPLACEMENT_REGEX__.sub("_", normalized)
+    # Optionally, add a hash for uniqueness if names could collide
+    import hashlib
+
+    hash_value = hashlib.md5(name.encode("utf-8")).hexdigest()
+    return hash_value
 
 
-def create_webscrape_assets():
-    store_information = get_store_information(STORES_PATH)
-    category_kwds = get_kwds(CATEGORIES_PATH)
-    article_kwds = get_kwds(ARTICLES_PATH)
-
-    for store in store_information:
-        store_name = get_dg_name(store.store_name)
-
-        @dg.asset(
-            name=store_name,
-            group_name=__GROUP_NAME__,
+@dg.asset(
+    name="store_urls",
+    group_name=__GROUP_NAME__,
+)
+def store_urls(context) -> list[str]:
+    collected_urls = set()
+    all_failed = True
+    for url in LOCATION_URLS:
+        store_urls = KaufdaProcessor.get_all_stores_at_location(
+            url=url, store_categories=STORE_CATEGORIES
         )
-        def webscrape(*, store: Store = store) -> dg.MaterializeResult:
-            today = date.today()
-            week_start = today - timedelta(days=date.weekday(today))
-            week_end = week_start + timedelta(days=6)
+        if store_urls is not None:
+            all_failed = False
+            collected_urls.update(store_urls)
 
-            t_start = time.time()
-            result = store.processor.process(
-                store_name=store.store_name,
-                store_url=store.offers_url,
-                store_id=store.store_id,
-                week_start=week_start,
-                week_end=week_end,
-                category_keywords=category_kwds,
-                article_keywords=article_kwds,
-            )
-            t_taken = time.time() - t_start
+    context.add_output_metadata(
+        {
+            "num_locations": len(LOCATION_URLS),
+            "location_urls": list(LOCATION_URLS),
+            "num_stores": len(collected_urls),
+            "store_urls": list(collected_urls),
+        }
+    )
 
-            return dg.MaterializeResult(
-                value=result,
-                metadata={
-                    "start_time": datetime.fromtimestamp(t_start).isoformat(),
-                    "time_taken": t_taken,
-                    "data": asdict(result),
-                    "success": result.success,
-                },
-            )
+    return list(collected_urls) if not all_failed else None
 
-        @dg.asset_check(
-            name=f"{store_name}_success",
-            asset=store_name,
+
+@dg.op(
+    name="webscrape_stores",
+    out=dg.DynamicOut(),
+)
+def webscrape_stores(store_urls) -> Generator[dg.DynamicOutput, None, None]:
+    for store_url in store_urls:
+        yield dg.DynamicOutput(
+            value=store_url,
+            mapping_key=get_hash_value(store_url),
         )
-        def check_success(result: WebprocessingResult) -> dg.AssetCheckResult:
-            return dg.AssetCheckResult(passed=result.success)
-
-        WEBSCRAPE_ASSETS.append(webscrape)
-        ASSET_CHECKS.append(check_success)
 
 
-create_webscrape_assets()
+@dg.op(
+    name="webscrape_store",
+    out=dg.Out(metadata={"result_type": "Output"}),
+)
+def webscrape_store(store_url) -> dg.Output:
+
+    t_start = time.time()
+    result = KaufdaProcessor.process(
+        store_url=store_url,
+        category_keywords=CATEGORY_KWDS,
+        article_keywords=ARTICLE_KWDS,
+    )
+    t_taken = time.time() - t_start
+
+    return dg.Output(
+        value=result,
+        metadata={
+            "start_time": datetime.fromtimestamp(t_start).isoformat(),
+            "time_taken": t_taken,
+            "data": str(result),
+            "success": result.success,
+        },
+    )

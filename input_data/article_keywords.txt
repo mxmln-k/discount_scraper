@@ -1,0 +1,76 @@
+Aperol
+Sekt
+Orangesaft
+O-Saft
+Apfelschorle
+Kola
+Cola
+Orangenlimonade
+Fanta
+Zitronenlimonade
+Limonade
+Sprite
+Sprudel
+
+Rothaus
+Tannenzäpfle
+Augustiner
+Paulaner
+Oettinger
+Öttinger
+Chiemseer
+Bayreuther
+Erdinger
+Franziskaner
+Weihenstephan
+Spaten
+Löwenbräu
+Hacker-Pschorr
+Hofbräu München
+HB München
+HB-München
+König Ludwig
+Ayinger
+Tegernseer
+Schneider Weisse
+Krombacher
+Bitburger
+Warsteiner
+Veltins
+Früh
+Füchschen
+Maisel's Weisse
+Maisel’s Weisse
+Maisel´s Weisse
+Maisel`s Weisse
+Mönchshof
+Zötler
+Fürstenberg
+Engelbräu
+Alpirsbacher
+
+Helles
+Lagerbier
+Pils
+Pilsner
+Export
+Hefeweizen
+Kristallweizen
+Dunkel
+Dunkelweizen
+Dunkles Weizen
+Bockbier
+Doppelbock
+Maibock
+Märzen
+Oktoberfestbier
+Altbier
+Alt
+Kölsch
+Rauchbier
+Zwickel
+Zwuckel
+Kellerbier
+Naturtrüb
+Schwarzbier
+Alkoholfrei

@@ -13,8 +13,8 @@ from discount_scraper.data.webprocessing_result import (
     Webcategory,
     WebprocessingResult,
 )
-from discount_scraper.processors.processor import Processor
-from discount_scraper.helpers import (
+from discount_scraper._deprecated_.processor import Processor
+from discount_scraper._deprecated_.helpers import (
     get_joined_textsubnodes_text,
     get_weekday,
     match_keywords,

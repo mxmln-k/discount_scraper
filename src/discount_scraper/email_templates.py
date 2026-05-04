@@ -1,5 +1,3 @@
-PERIOD_NOT_VERIFIED = "Angebotsdauer konnte nicht verifiziert werden!"
-
 __BASE_HTML_TEMPLATE__ = """
 <html>
     <body>
@@ -50,6 +48,16 @@ __INFO_HTML_TEMPLATE__ = """
 <li>{content}</li>
 """
 
+PARSING_ERROR_HTML_TEMPLATE = """
+<html>
+    <body>
+        <h1>Error!</h1>
+        
+        <b>Error during parsing. No results could be generated. Maybe internet connection was down?</b>
+    </body>
+</html>
+"""
+
 __BASE_PLAIN_TEMPLATE__ = """
 Angebote der kommenden Woche
         
@@ -84,6 +92,12 @@ __OFFER_PLAIN_TEMPLATE__ = """
 
 __INFO_PLAIN_TEMPLATE__ = """
             {content}
+"""
+
+PARSING_ERROR_PLAIN_TEMPLATE = """
+Error!
+
+Error during parsing. No results could be generated. Maybe internet connection was down?
 """
 
 TEMPLATES = {

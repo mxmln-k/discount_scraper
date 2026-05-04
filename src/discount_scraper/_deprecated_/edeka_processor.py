@@ -10,8 +10,8 @@ from discount_scraper.data.webprocessing_result import (
     Webcategory,
     WebprocessingResult,
 )
-from discount_scraper.processors.processor import Processor
-from discount_scraper.helpers import (
+from discount_scraper._deprecated_.processor import Processor
+from discount_scraper._deprecated_.helpers import (
     get_joined_textsubnodes_text,
     match_keywords,
 )
@@ -172,7 +172,7 @@ class EdekaProcessor(Processor):
             webcategory = self._parse_category(
                 driver, category, category_keywords, article_keywords
             )
-            if webcategory:
+            if webcategory and webcategory.offers:
                 category_results.append(webcategory)
 
         result = WebprocessingResult(
