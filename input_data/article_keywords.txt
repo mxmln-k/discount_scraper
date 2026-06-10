@@ -1,4 +1,6 @@
 Aperol
+Aperitivo
+Bitterol
 Sekt
 Orangesaft
 O-Saft
