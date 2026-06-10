@@ -5,10 +5,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import dagster as dg
 from discount_scraper.data.webprocessing_result import WebprocessingResult
-from discount_scraper.defs.assets.webscraper import webscrape_store
 from discount_scraper.user_input import get_list
 from discount_scraper.constants import RECIPIENT_EMAILS_PATH
-from discount_scraper.email_templates import PARSING_ERROR_HTML_TEMPLATE, PARSING_ERROR_PLAIN_TEMPLATE
+from discount_scraper.email_templates import (
+    PARSING_ERROR_HTML_TEMPLATE,
+    PARSING_ERROR_PLAIN_TEMPLATE,
+)
 
 RECIPIENT_MAIL_ADDRESSES = get_list(RECIPIENT_EMAILS_PATH)
 
@@ -39,9 +41,7 @@ def mail_message(results: list[WebprocessingResult] | None) -> dg.Output:
     msg.attach(plain_text_mime)
     msg.attach(html_text_mime)
 
-    return dg.Output(
-        value=msg, metadata={"plain_text": plain_text, "html": html_text}
-    )
+    return dg.Output(value=msg, metadata={"plain_text": plain_text, "html": html_text})
 
 
 @dg.op(
@@ -66,5 +66,5 @@ def send_mail(mail_message: MIMEMultipart) -> dg.Output:
             "sender": sender,
             "recipients": list(RECIPIENT_MAIL_ADDRESSES),
             "message_string": msg_str,
-        }
+        },
     )

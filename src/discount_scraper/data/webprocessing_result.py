@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from html import escape
 from typing import Literal
 
 from discount_scraper.email_templates import TEMPLATES
@@ -32,23 +33,33 @@ class WebprocessingResult:
     exception: str | None = None
 
     @classmethod
-    def parse(cls, wprs: list[WebprocessingResult], kind: Literal["plain", "html"]) -> str:
+    def parse(
+        cls, wprs: list["WebprocessingResult"], kind: Literal["plain", "html"]
+    ) -> str:
         wprs = cls.get_filtered_results(wprs)
+
+        def format_value(value: str) -> str:
+            return escape(value) if kind == "html" else value
+
         return TEMPLATES[kind]["base"].format(
             stores="\n".join(
                 (
                     TEMPLATES[kind]["store"].format(
                         name=(
-                            f"{wpr.store_name} (gültig bis {wpr.offer_end_date.strftime("%d.%m.%Y") if wpr.offer_end_date else "N/A"})"
+                            format_value(
+                                f"{wpr.store_name} (gültig bis {wpr.offer_end_date.strftime('%d.%m.%Y') if wpr.offer_end_date else 'N/A'})"
+                            )
                         ),
                         categories="\n".join(
                             TEMPLATES[kind]["category"].format(
-                                name=category.name,
+                                name=format_value(category.name),
                                 offers="\n".join(
                                     TEMPLATES[kind]["offer"].format(
-                                        name=offer.name,
+                                        name=format_value(offer.name),
                                         infos="\n".join(
-                                            TEMPLATES[kind]["info"].format(content=info)
+                                            TEMPLATES[kind]["info"].format(
+                                                content=format_value(info)
+                                            )
                                             for info in offer.info
                                         ),
                                     )
@@ -59,12 +70,16 @@ class WebprocessingResult:
                         ),
                     )
                     if wpr.success
-                    else TEMPLATES[kind]["failed"].format(name=wpr.store_name)
+                    else TEMPLATES[kind]["failed"].format(
+                        name=format_value(wpr.store_name)
+                    )
                 )
                 for wpr in wprs
             )
         )
 
     @staticmethod
-    def get_filtered_results(results: list["WebprocessingResult"]) -> list[Webcategory]:
+    def get_filtered_results(
+        results: list["WebprocessingResult"],
+    ) -> list["WebprocessingResult"]:
         return [result for result in results if result.categories or not result.success]
