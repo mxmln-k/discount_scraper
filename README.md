@@ -8,6 +8,7 @@ Scrapes current discounts in local supermarket from their websites, packages the
 
 - Python 3.10 or higher
 - Setting up SENDER_MAIL_ADDRESS, SENDER_MAIL_PASSWORD and SENDER_MAIL_SMTP_SERVER in `.env` file (see `.env.example` for reference)
+- Entering information to all files in input_data folder (example data is already provided, but can be replaced with real data). Only recipient_mail_addresses.txt **has to be filled out**. Leaving category_keywords.txt, article_keywords.txt or store_category_urls.txt empty will just result in no filtering of the scraped data, but the scraper will still run and send out all scraped discounts. store_category_urls.txt needs to contain all overview URLs of KaufDa you want to scrape (for example, see current content for Freiburg im Breisgau).
 - Makefiles (optional, but recommended for easier setup and running)
 
 ### Installing dependencies
