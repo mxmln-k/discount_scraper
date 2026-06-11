@@ -4,6 +4,12 @@ Scrapes current discounts in local supermarket from their websites, packages the
 
 ## Getting started
 
+### Prerequisites
+
+- Python 3.10 or higher
+- Setting up SENDER_MAIL_ADDRESS, SENDER_MAIL_PASSWORD and SENDER_MAIL_SMTP_SERVER in `.env` file (see `.env.example` for reference)
+- Makefiles (optional, but recommended for easier setup and running)
+
 ### Installing dependencies
 
 **Option 1: Makefile**
@@ -58,10 +64,10 @@ Start the Dagster UI web server.
 
 **Option 1: Using Makefiles:**
 
-If you setup supports makefiles just run the following command:
+If your setup supports makefiles just run the following command:
 
 ```bash
-make gui
+make run
 ```
 
 **Option 2: Directly in Terminal**
@@ -69,10 +75,10 @@ make gui
 Run the following command:
 
 ```bash
-dg dev
+dagster dev
 ```
 
-Open http://localhost:3000 in your browser to see the project.
+Open http://localhost:3000 (or the URL shown in the terminal if already in use) in your browser to activate and view the project.
 
 ## Learn more
 
