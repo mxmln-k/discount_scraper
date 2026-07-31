@@ -1,8 +1,15 @@
-create_venv:
-	@python -m venv .venv
+ifeq ($(OS),Windows_NT)
+SETUP_SCRIPT := setup.bat
+RUN_SCRIPT := run.bat
+SCRIPT_PREFIX := cmd /C
+else
+SETUP_SCRIPT := ./setup.sh
+RUN_SCRIPT := ./run.sh
+SCRIPT_PREFIX :=
+endif
 
-setup: create_venv
-	@.venv/bin/pip install --editable . --group dev
+setup:
+	@$(SCRIPT_PREFIX) $(SETUP_SCRIPT)
 
 run:
-	@.venv/bin/python scripts/run_dagster.py
+	@$(SCRIPT_PREFIX) $(RUN_SCRIPT)
