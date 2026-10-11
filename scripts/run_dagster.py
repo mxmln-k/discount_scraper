@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 import re
 import signal
 import subprocess
@@ -10,10 +11,11 @@ import webbrowser
 
 
 URL_PATTERN = re.compile(r"Serving dagster-webserver on (http://\S+)")
+dagster = Path(__file__).parent.parent / ".venv" / "bin" / "dagster"
 
 
 child = subprocess.Popen(
-    ["dagster", "dev"],
+    [str(dagster), "dev"],
     stdout=subprocess.PIPE,
     stderr=subprocess.STDOUT,
     text=True,
