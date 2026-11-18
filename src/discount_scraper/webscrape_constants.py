@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 
 # Webscrape settings
 LOAD_TIMEOUT_SECONDS_LONG = 60.0
-LOAD_TIMEOUT_SECONDS_SHORT = 10.0
+LOAD_TIMEOUT_SECONDS_SHORT = 30.0
 OPTIONS = webdriver.ChromeOptions()
 OPTIONS.add_argument("--headless")
 OPTIONS.add_argument("window-size=1920,1080")

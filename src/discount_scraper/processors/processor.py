@@ -84,8 +84,6 @@ class Processor(ABC):
     def _run_processing(
         cls,
         driver: WebDriver,
-        week_start: date,
-        week_end: date,
         category_keywords: Iterable[re.Pattern] | None,
         article_keywords: Iterable[re.Pattern] | None,
     ) -> WebprocessingResult | None: ...

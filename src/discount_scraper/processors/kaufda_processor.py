@@ -362,7 +362,7 @@ class KaufdaProcessor(Processor):
     def _click_offers_button(cls, contents_element: WebElement) -> None:
         offers_button = contents_element.find_element(
             by=By.XPATH,
-            value="./div[@data-testid='tabs']/div/span[2]",
+            value="./div[@data-testid='tabs']/div/button[2]",
         )
         offers_button.click()
 
@@ -544,7 +544,7 @@ class KaufdaProcessor(Processor):
         )
         address_element = store_info_element.find_element(
             by=By.XPATH,
-            value="./div/div/div/div[@class='max-w-[200px] truncate']",
+            value="./div/div/span[@class='align-middle']",
         )
 
         store_name = cls.get_joined_textsubnodes_text(driver, store_name_element)
@@ -568,12 +568,15 @@ class KaufdaProcessor(Processor):
         cls.reject_cookies(driver, driverwait)
         cls.close_further_popups(driver, driverwait)
 
-        contents_element = driver.find_element(
-            by=By.XPATH, value="//body/div[@id='root']/main//div[@class='contents']"
-        )
-        store_name, offer_end_date, address = cls._get_store_info(
-            driver, contents_element
-        )
+        try:
+            contents_element = driver.find_element(
+                by=By.XPATH, value="//body/div[@id='root']/main//div[@class='contents']"
+            )
+            store_name, offer_end_date, address = cls._get_store_info(
+                driver, contents_element
+            )
+        except Exception:
+            store_name, offer_end_date, address = "Unknown", None, "Unknown"
 
         cls._click_offers_button(contents_element)
 
@@ -604,10 +607,3 @@ class KaufdaProcessor(Processor):
             success=True,
         )
 
-
-# p = KaufdaProcessor()
-# p.process(
-#     store_url="https://www.kaufda.de/contentViewer/static/daa424ed-db1c-4c93-9db9-cc35a1167601?adFormat=ad_format__brochure_premium&adPlacement=ad_placement__shelf_sort_managed&feature=brochure_shelf_premium_card&lat=47.9975&lng=7.8465&pageType=SHELF_PAGE&retailerName=Lidl&sourceValue=Lidl&sourceType=PORTAL_WIDGET&visitOriginType=WEB_REFERRER_SEO&zip=79098&page=14&productId=48c205e7-e9f8-4880-8963-1ee278ca4966&locality=Freiburg+im+Breisgau",
-#     article_keywords=None,
-#     category_keywords=None,
-# )

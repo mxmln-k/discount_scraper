@@ -9,8 +9,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "dagster-webserver==1.12.19",
-    "dagster-dg-cli==1.12.19",
+    "dagster-webserver>=1.12.19",
+    "dagster-dg-cli>=1.12.19",
 ]
 
 [build-system]

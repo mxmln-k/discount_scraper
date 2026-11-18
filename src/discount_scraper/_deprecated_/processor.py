@@ -36,8 +36,6 @@ class Processor(ABC):
         store_name: str,
         store_id: str,
         driver: WebDriver,
-        week_start: date,
-        week_end: date,
         category_keywords: Iterable[str] | None,
         article_keywords: Iterable[str] | None,
     ) -> WebprocessingResult | None: ...
